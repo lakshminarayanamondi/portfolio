@@ -2,10 +2,13 @@ import Layout from '@/components/Layout';
 import Navigation from '@/components/Navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Eye, Download, ExternalLink } from 'lucide-react';
 import { useState } from 'react';
 
 const Certifications = () => {
   const [selectedCert, setSelectedCert] = useState<any>(null);
+  const [viewMode, setViewMode] = useState<'grid' | 'detail'>('grid');
 
   const certifications = [
     {
@@ -68,6 +71,20 @@ const Certifications = () => {
     
   ];
 
+  const handleViewCertificate = (cert: any) => {
+    setSelectedCert(cert);
+    setViewMode('detail');
+  };
+
+  const handleDownloadCertificate = (cert: any) => {
+    // Create a download link for the certificate image
+    const link = document.createElement('a');
+    link.href = cert.image;
+    link.download = `${cert.title.replace(/\s+/g, '_')}_Certificate.jpg`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
   return (
     <Layout>
       <Navigation />
@@ -81,9 +98,26 @@ const Certifications = () => {
             <p className="text-xl text-muted-foreground max-w-3xl mx-auto animate-slideUp">
               Professional certifications and achievements in technology and development
             </p>
+            
+            {/* View Mode Toggle */}
+            <div className="flex justify-center gap-4 mt-8">
+              <Button 
+                variant={viewMode === 'grid' ? 'default' : 'outline'}
+                onClick={() => setViewMode('grid')}
+              >
+                Grid View
+              </Button>
+              <Button 
+                variant={viewMode === 'detail' ? 'default' : 'outline'}
+                onClick={() => setViewMode('detail')}
+              >
+                Detail View
+              </Button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {viewMode === 'grid' ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {certifications.map((cert, index) => (
               <Dialog key={index}>
                 <DialogTrigger asChild>
@@ -100,6 +134,32 @@ const Certifications = () => {
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" 
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        
+                        {/* Action Buttons Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="bg-background/80 backdrop-blur-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleViewCertificate(cert);
+                            }}
+                          >
+                            <Eye className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="secondary"
+                            className="bg-background/80 backdrop-blur-sm"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleDownloadCertificate(cert);
+                            }}
+                          >
+                            <Download className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </div>
                       <CardTitle className="gradient-text text-sm group-hover:scale-105 transition-transform duration-300">
                         {cert.title}
@@ -168,7 +228,123 @@ const Certifications = () => {
                 </DialogContent>
               </Dialog>
             ))}
-          </div>
+            </div>
+          ) : (
+            /* Detail View Mode */
+            <div className="space-y-8">
+              {selectedCert ? (
+                <div className="max-w-4xl mx-auto">
+                  <Card className="glass-card">
+                    <CardHeader>
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <CardTitle className="gradient-text text-3xl mb-2">
+                            {selectedCert.title}
+                          </CardTitle>
+                          <div className="text-accent font-medium text-lg mb-4">
+                            {selectedCert.issuer} • {selectedCert.date}
+                          </div>
+                        </div>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="outline"
+                            onClick={() => handleDownloadCertificate(selectedCert)}
+                          >
+                            <Download className="w-4 h-4 mr-2" />
+                            Download
+                          </Button>
+                        </div>
+                      </div>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        {/* Certificate Image */}
+                        <div className="space-y-4">
+                          <div className="relative group">
+                            <img 
+                              src={selectedCert.image} 
+                              alt={selectedCert.title} 
+                              className="w-full h-auto rounded-lg shadow-lg cursor-pointer hover:scale-105 transition-transform duration-300" 
+                              onClick={() => window.open(selectedCert.image, '_blank')}
+                            />
+                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 rounded-lg">
+                              <Button variant="secondary" size="sm">
+                                <ExternalLink className="w-4 h-4 mr-2" />
+                                View Full Size
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Certificate Details */}
+                        <div className="space-y-6">
+                          <div>
+                            <h4 className="text-xl font-semibold mb-3 gradient-text">Description</h4>
+                            <p className="text-muted-foreground leading-relaxed">
+                              {selectedCert.description}
+                            </p>
+                          </div>
+                          
+                          <div>
+                            <h4 className="text-xl font-semibold mb-3 gradient-text">Skills Acquired</h4>
+                            <div className="flex flex-wrap gap-2">
+                              {selectedCert.skills.map((skill, i) => (
+                                <span
+                                  key={i}
+                                  className="px-3 py-2 text-sm rounded-full bg-primary/20 text-primary border border-primary/30"
+                                >
+                                  {skill}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          
+                          <div className="p-4 rounded-lg bg-secondary/30">
+                            <h4 className="font-semibold mb-2">Credential Information</h4>
+                            <div className="space-y-1 text-sm">
+                              <p><strong>Credential ID:</strong> {selectedCert.credentialId}</p>
+                              <p><strong>Issue Date:</strong> {selectedCert.date}</p>
+                              <p><strong>Issuing Organization:</strong> {selectedCert.issuer}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <h3 className="text-2xl font-semibold mb-4 gradient-text">Select a Certificate to View</h3>
+                  <p className="text-muted-foreground mb-8">Choose a certificate from the list below to view its details</p>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-4xl mx-auto">
+                    {certifications.map((cert, index) => (
+                      <Card 
+                        key={index}
+                        className="glass-card hover-lift cursor-pointer"
+                        onClick={() => setSelectedCert(cert)}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center gap-3">
+                            <img 
+                              src={cert.image} 
+                              alt={cert.title} 
+                              className="w-12 h-12 object-cover rounded" 
+                            />
+                            <div className="flex-1 text-left">
+                              <h4 className="font-semibold text-sm">{cert.title}</h4>
+                              <p className="text-xs text-muted-foreground">{cert.issuer}</p>
+                            </div>
+                            <Eye className="w-4 h-4 text-accent" />
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </Layout>
