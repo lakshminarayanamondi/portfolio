@@ -1,4 +1,5 @@
 import { Link, useLocation } from 'react-router-dom';
+import ThemeToggle from './ThemeToggle';
 
 const Navigation = () => {
   const location = useLocation();
@@ -43,6 +44,7 @@ const Navigation = () => {
           </div>
 
           <div className="flex items-center space-x-4">
+            <ThemeToggle />
             <a
               href="mailto:lokeshmondi4@gmail.com"
               className="px-4 py-2 bg-gradient-to-r from-primary to-accent rounded-full text-background text-sm font-semibold hover:scale-105 transition-all duration-300"

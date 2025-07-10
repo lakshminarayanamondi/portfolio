@@ -13,7 +13,7 @@ interface LayoutProps {
 
 const Layout = ({ children, showAnimatedBackground = false, showHeader = true, showFooter = true }: LayoutProps) => {
   return (
-    <div className="min-h-screen bg-background relative">
+    <div className="min-h-screen bg-background relative transition-colors duration-300">
       <CustomCursor />
       {showAnimatedBackground && <AnimatedBackground />}
       {showHeader && <Header />}
