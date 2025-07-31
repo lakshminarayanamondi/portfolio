@@ -5,43 +5,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const Resume = () => {
   const downloadPDF = () => {
-    // Create a simple PDF-like content and download
-    const content = `
-MONDI LAKSHMI NARAYANA
-B.Tech Computer Science Student | AI/ML Enthusiast | Python Developer
-
-Contact Information:
-Phone: 9121434023
-Email: lokeshmondi4@gmail.com
-LinkedIn: http://linkedin.com/in/mondiLakshmiNarayana
-
-Career Objective:
-A passionate and innovative B.Tech student driven by interests in Artificial Intelligence, Machine Learning, and creative digital experiences...
-
-Technical Skills:
-- Programming Languages: Python, Java
-- AI/ML & Frameworks: Scikit-learn, Pandas, NumPy, TensorFlow
-- Web Technologies: HTML5, CSS
-- Tools: VS Code, Jupyter Notebook, Google Colab, MS Office
-
-Experience:
-1. Virtual Intern - Infosys Springboard (Oct - Dec 2024)
-2. Intern - Microsoft with Edunet Foundation (May - June 2025)
-
-Education:
-B.Tech Computer Science (AI & ML) - BVC College of Engineering
-Expected April 2026 | CGPA: 62%
-    `;
-    
-    const blob = new Blob([content], { type: 'text/plain' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'Mondi_Lakshmi_Narayana_Resume.pdf';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    window.URL.revokeObjectURL(url);
+    // Download the actual PDF file from public folder
+    const link = document.createElement('a');
+    link.href = '/resume.pdf';
+    link.download = 'Mondi_Lakshmi_Narayana_Resume.pdf';
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   return (
@@ -99,10 +70,6 @@ Expected April 2026 | CGPA: 62%
                 onClick={downloadPDF}
                 className="px-8 py-4 bg-gradient-to-r from-primary to-accent rounded-full text-background font-semibold hover:scale-105 transition-all duration-300 inline-flex items-center gap-3 shadow-lg"
               >
-                <a
-                   href="/resume.pdf" download
-           
->   </a>
                 <Download className="w-5 h-5" />
                 Download Resume
               </button>
